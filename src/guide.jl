@@ -28,6 +28,26 @@ const left_guide_position   = LeftGuidePosition()
 const under_guide_position  = UnderGuidePosition()
 const over_guide_position   = OverGuidePosition()
 
+immutable CrossHair <: Gadfly.GuideElement
+end
+
+const crosshair = CrossHair
+
+function render(guide::CrossHair, theme::Gadfly.Theme,
+                aes::Gadfly.Aesthetics)
+    text_box = compose!(
+        context(),
+        text(1.0,0.0,"hi there",hright,vtop),
+        svgclass("text_box"))
+
+    root = compose!(
+        context(withjs=true, units=UnitBox()),
+        text_box,
+        svgclass("guide crosshair"),
+        fillopacity(0.0))
+
+    return [PositionedGuide([root], 0, over_guide_position)]
+end
 
 # A guide graphic is a position associated with one or more contexts.
 # Multiple contexts represent multiple layout possibilites that will be

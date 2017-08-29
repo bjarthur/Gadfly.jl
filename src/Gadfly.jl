@@ -619,6 +619,10 @@ function render_prepare(plot::Plot)
             push!(guides, Guide.background())
         end
 
+        if !in(Guide.CrossHair, explicit_guide_types)
+            push!(guides, Guide.crosshair())
+        end
+
         if !in(Guide.XTicks, explicit_guide_types)
             push!(guides, Guide.xticks())
         end
@@ -1079,7 +1083,7 @@ function display(d::REPLDisplay, ::MIME"text/html", p::Union{Plot,Compose.Contex
             <title>Gadfly Plot</title>
             <meta charset="utf-8">
           </head>
-            <body>
+            <body style="margin:0">
             <script charset="utf-8">
                 $(readstring(Compose.snapsvgjs))
             </script>

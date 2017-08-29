@@ -132,6 +132,7 @@ Snap.plugin(function (Snap, Element, Paper, global) {
 
     Element.prototype.init_gadfly = function() {
         this.mouseenter(Gadfly.plot_mouseover)
+            .mousemove(Gadfly.plot_mousemove)
             .mouseleave(Gadfly.plot_mouseout)
             .dblclick(Gadfly.plot_dblclick)
             .mousewheel(Gadfly.guide_background_scroll)
@@ -144,6 +145,33 @@ Snap.plugin(function (Snap, Element, Paper, global) {
         return this;
     };
 });
+
+
+Gadfly.plot_mousemove = function(event, x_px, y_px) {
+    var root = this.plotroot();
+    if (root.data("crosshair")) {
+        px_per_mm = root.data("px_per_mm");
+        bB = document.getElementsByTagName('boundingbox')[0].getAttribute("value").split(" ");
+        uB = document.getElementsByTagName('unitbox')[0].getAttribute("value").split(" ");
+        xscale = root.data("xscale");
+        yscale = root.data("yscale");
+        xtranslate = root.data("tx");
+        ytranslate = root.data("ty");
+
+        xoff_mm = bB[0].substr(0,bB[0].length-2)/1;
+        yoff_mm = bB[1].substr(0,bB[1].length-2)/1;
+        xoff_unit = uB[0]/1;
+        yoff_unit = uB[1]/1;
+        mm_per_xunit = bB[2].substr(0,bB[2].length-2) / uB[2];
+        mm_per_yunit = bB[3].substr(0,bB[3].length-2) / uB[3];
+         
+        x_unit = ((x_px / px_per_mm - xtranslate) / xscale - xoff_mm) / mm_per_xunit + xoff_unit;
+        y_unit = ((y_px / px_per_mm - ytranslate) / yscale - yoff_mm) / mm_per_yunit + yoff_unit;
+
+        root.select(".text_box").node.childNodes[1].innerHTML =
+                x_unit.toPrecision(3)+","+y_unit.toPrecision(3);
+    };
+};
 
 
 // When the plot is moused over, emphasize the grid lines.
@@ -172,6 +200,10 @@ Gadfly.plot_mouseover = function(event) {
                     root.data("xscale"), root.data("yscale"));
         } else if (event.which == 82) { // r
             set_plot_pan_zoom(root, 0.0, 0.0, 1.0, 1.0);
+        } else if (event.which == 67) { // c
+            root.data("crosshair",!root.data("crosshair"));
+            root.select(".crosshair")
+                .animate({opacity: root.data("crosshair") ? 1.0 : 0.0}, 250);
         }
     };
     root.data("keyboard_pan_zoom", keyboard_pan_zoom);
@@ -448,6 +480,8 @@ var init_pan_zoom = function(root) {
     if (root.data("zoompan-ready")) {
         return;
     }
+
+    root.data("crosshair",false);
 
     // The non-scaling-stroke trick. Rather than try to correct for the
     // stroke-width when zooming, we force it to a fixed value.
