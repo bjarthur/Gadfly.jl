@@ -7,7 +7,6 @@ using DataStructures
 using Gadfly
 using Showoff
 using IndirectArrays
-using CategoricalArrays
 using Printf
 
 import Gadfly: element_aesthetics, isconcrete, concrete_length, discretize_make_ia, aes2str
@@ -166,9 +165,6 @@ function apply_scale(scale::ContinuousScale,
     for (aes, data) in zip(aess, datas)
         for var in scale.vars
             vals = getfield(data, var)
-            if vals isa CategoricalArray
-                throw(ArgumentError("continuous scale for $var aesthetic when stored as a CategoricalArray. Consider using a discrete scale or convert data to an Array."))
-            end
             vals === nothing && continue
 
             # special case for function arrays bound to :y

@@ -8,7 +8,6 @@ using DataStructures
 using JSON
 using Showoff
 using IndirectArrays
-using CategoricalArrays
 using Printf
 using Base64
 
@@ -1206,7 +1205,6 @@ const CategoricalType = Union{AbstractString, Bool, Symbol}
 
 classify_data(data::AbstractArray{T, N}) where {N, T <: Union{CategoricalType,Missing}}        = :categorical
 classify_data(data::AbstractArray{T, N}) where {N, T <: Union{Base.Callable,Measure,Colorant}} = :functional
-classify_data(data::CategoricalArray) = :categorical
 classify_data(data::T) where {T <: Base.Callable} = :functional
 classify_data(data::AbstractArray) = :numerical
 classify_data(data::Distribution) = :distribution
